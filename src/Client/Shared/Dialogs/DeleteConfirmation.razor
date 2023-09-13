@@ -1,0 +1,55 @@
+﻿@namespace BlazorHero.CleanArchitecture.Client.Shared.Dialogs
+@inject Microsoft.Extensions.Localization.IStringLocalizer<DeleteConfirmation> localizer
+@inject DialogService DialogService
+
+@*<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Delete" Class="mr-3 mb-n1" />
+            @localizer["Delete Confirmation"]
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>@ContentText</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@localizer["Cancel"]</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="Submit">@localizer["Confirm"]</MudButton>
+    </DialogActions>
+</MudDialog>*@
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Dialog with inline Blazor content" ButtonStyle="ButtonStyle.Secondary" Click=@ShowInlineDialog />
+</div>
+
+@code {
+    //[CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    //[Parameter] public string ContentText { get; set; }
+
+    //void Submit()
+    //{
+    //    MudDialog.Close(DialogResult.Ok(true));
+    //}
+    //void Cancel() => MudDialog.Cancel();
+
+    async Task ShowInlineDialog()
+    {
+        var result = await DialogService.OpenAsync(@localizer["Delete Confirmation"], ds =>
+    @<RadzenStack Gap="1.5rem">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text=@localizer["Confirm"] Click="() => ds.Close(true)" Style="width: 80px;" />
+                <RadzenButton Text=@localizer["Cancel"] Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+            </RadzenStack>
+            <RadzenButton Text="Refresh" Click="(() => { ds.Refresh(); })" ButtonStyle="ButtonStyle.Light" />
+        </RadzenStack>
+    </RadzenStack>);
+    }
+
+    void Submit()
+    {
+        DialogService.Close(true);
+    }
+    void Cancel() => DialogService.Close();
+}

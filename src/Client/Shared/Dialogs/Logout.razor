@@ -1,0 +1,83 @@
+﻿@using BlazorHero.CleanArchitecture.Shared.Constants.Application
+@using Microsoft.AspNetCore.SignalR.Client
+@namespace BlazorHero.CleanArchitecture.Client.Shared.Dialogs
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Logout> localizer
+@inject DialogService DialogService
+@*<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Logout" Class="mr-3 mb-n1" />
+            @localizer["Logout Confirmation"]
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>@ContentText</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">@localizer["Cancel"]</MudButton>
+        <MudButton Color="@Color" Variant="Variant.Filled" OnClick="Submit">@ButtonText</MudButton>
+    </DialogActions>
+</MudDialog>*@
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Dialog with inline Blazor content" ButtonStyle="ButtonStyle.Secondary" Click=@ShowInlineDialog />
+</div>
+
+@code {
+
+    [Parameter] public HubConnection HubConnection { get; set; }
+
+    [Parameter] public string ContentText { get; set; }
+
+    [Parameter] public string ButtonText { get; set; }
+
+    //[Parameter] public Color Color { get; set; }
+
+    [Parameter] public string CurrentUserId { get; set; }
+
+    async Task ShowInlineDialog()
+    {
+        var result = await DialogService.OpenAsync(@localizer["Logout Confirmation"], ds =>
+    @<RadzenStack Gap="1.5rem">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text=@localizer["Confirm"] Click="Submit" Style="width: 80px;" />
+                <RadzenButton Text=@localizer["Cancel"] Click="Cancel" ButtonStyle="ButtonStyle.Light" />
+            </RadzenStack>
+            <RadzenButton Text="Refresh" Click="(() => { ds.Refresh(); })" ButtonStyle="ButtonStyle.Light" />
+        </RadzenStack>
+    </RadzenStack>
+    );
+
+        async Task Submit()
+        {
+            await HubConnection.SendAsync(ApplicationConstants.SignalR.OnDisconnect, CurrentUserId);
+            await _authenticationManager.Logout();
+            _navigationManager.NavigateTo("/login");
+            DialogService.Close();
+        }
+
+        void Cancel() => DialogService.Close();
+    }
+
+    //[CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    //[Parameter] public HubConnection HubConnection { get; set; }
+
+    //[Parameter] public string ContentText { get; set; }
+
+    //[Parameter] public string ButtonText { get; set; }
+
+    //[Parameter] public Color Color { get; set; }
+
+    //[Parameter] public string CurrentUserId { get; set; }
+
+    //async Task Submit()
+    //{
+    //    await HubConnection.SendAsync(ApplicationConstants.SignalR.OnDisconnect, CurrentUserId);
+    //    await _authenticationManager.Logout();
+    //    _navigationManager.NavigateTo("/login");
+    //    MudDialog.Close(DialogResult.Ok(true));
+    //}
+    //void Cancel() => MudDialog.Cancel();
+}

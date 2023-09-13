@@ -1,0 +1,53 @@
+﻿@page "/login"
+@layout MainLayout
+@attribute [AllowAnonymous]
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Login> _localizer
+
+<EditForm Model="@_tokenModel" OnValidSubmit="SubmitAsync">
+    <FluentValidationValidator @ref="_fluentValidationValidator" />
+    <RadzenStack>
+        <RadzenRow xs="12">
+            <div class="d-flex justify-center">
+                <RadzenIcon Icon="@CustomIcons.BlazorHero" Color="Color.Primary" Size="Size.Large" ViewBox="0 0 500 500" Style="width: 100px; height: 100px;" />
+            </div>
+        </RadzenRow>
+        <DataAnnotationsValidator />
+        <RadzenRow xs="12">
+            <div class="d-flex justify-center">
+                <RadzenText Typo="Typo.h4">@_localizer["Title"]</RadzenText>
+            </div>
+        </RadzenRow>
+        <RadzenRow xs="12">
+            <div class="d-flex justify-center">
+                <RadzenText>@_localizer["Description"]</RadzenText>
+            </div>
+        </RadzenRow>
+        <RadzenRow xs="12">
+            <div class="d-flex justify-center">
+                <RadzenText>@_localizer["Don't have an account?"] <RadzenLink Href="/register">@_localizer["Register here"]</RadzenLink></RadzenText>
+            </div>
+        </RadzenRow>
+        <RadzenRow xs="12">
+            <RadzenTextArea T="string" Label="@_localizer["E-mail"]" Variant="Variant.Outlined"
+                            @bind-Value="_tokenModel.Email" For="@(() => _tokenModel.Email)" />
+        </RadzenRow>
+        <RadzenRow xs="12">
+            <RadzenTextArea Label="@_localizer["Password"]" Variant="Variant.Outlined"
+                            @bind-Value="_tokenModel.Password" For="@(() => _tokenModel.Password)"
+                            InputType="@_passwordInput" Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+        </RadzenRow>
+        <RadzenRow xs="12" Class="d-flex justify-space-between align-center">
+            <RadzenCheckBox @bind-Value=@value Name="@_localizer["Remember me?"]" />
+            @*<MudCheckBox T="bool" Label="@_localizer["Remember me?"]" Color="Color.Primary" Class="ml-n1"></MudCheckBox>*@ <RadzenLink Href="/account/forgot-password">@_localizer["Forgot password?"]</RadzenLink>
+        </RadzenRow>
+        <RadzenRow xs="12" Class="d-flex justify-center">
+            <RadzenButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Disabled="@(!Validated)" Color="Color.Primary" Style="width: 100%;">@_localizer["Sign In"]</RadzenButton>
+        </RadzenRow>
+        <RadzenRow xs="12">
+            <RadzenButton OnClick="FillAdministratorCredentials">@_localizer["Fill Administrator Credentials"]</RadzenButton>
+        </RadzenRow>
+        <RadzenRow xs="12">
+            <RadzenButton OnClick="FillBasicUserCredentials">@_localizer["Fill Basic User Credentials"]</RadzenButton>
+        </RadzenRow>
+    </RadzenStack>
+</EditForm>

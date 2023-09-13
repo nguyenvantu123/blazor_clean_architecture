@@ -1,0 +1,132 @@
+﻿@inject Microsoft.Extensions.Localization.IStringLocalizer<NavMenu> _localizer
+@using System.Security.Claims
+
+<UserCard />
+<RadzenMenu>
+    <RadzenMenuItem Href="/" Match="NavLinkMatch.All" Icon="home">@_localizer["Home"]</RadzenMenuItem>
+    @if (_canViewHangfire)
+    {
+        <RadzenMenuItem Href="/jobs" Target="_blank" Icon="group_work">
+            @_localizer["Hangfire"]
+        </RadzenMenuItem>
+    }
+    <RadzenMenuItem Href="https://codewithmukesh.com/blog/blazor-hero-quick-start-guide/" Target="_blank" Icon="readmore">
+        @_localizer["Quick Start Guide"]
+    </RadzenMenuItem>
+    <RadzenMenuItem Href="/swagger/index.html" Target="_blank" Icon="help">
+        @_localizer["Swagger"]
+    </RadzenMenuItem>
+    <RadzenMenuItem Class="mt-2 mb-n2">
+        @_localizer["Personal"]
+        @if (_canViewDashboards)
+        {
+            <RadzenMenuItem>
+                Href="/dashboard" Icon="dashboard">
+                @_localizer["Dashboard"]
+            </RadzenMenuItem>
+        }
+    </RadzenMenuItem>
+    <RadzenMenuItem Href="/account" Icon="account_box">
+        @_localizer["Account"]
+    </RadzenMenuItem>
+    @if (_canViewAuditTrails)
+    {
+        <RadzenMenuItem Href="/audit-trails" Icon="security">
+            @_localizer["Audit Trails"]
+        </RadzenMenuItem>
+    }
+    @if (_canViewDocuments || _canViewDocumentTypes)
+    {
+        <RadzenMenuItem Class="mt-2 mb-n2">
+            @_localizer["Document Management"]
+            @if (_canViewDocuments)
+            {
+                <RadzenMenuItem Href="/document-store" Icon="attachfile">
+                    @_localizer["Document Store"]
+                </RadzenMenuItem>
+            }
+            @if (_canViewDocumentTypes)
+            {
+                <RadzenMenuItem Href="/document-types" Icon="filecopy">
+                    @_localizer["Document Types"]
+                </RadzenMenuItem>
+            }
+        </RadzenMenuItem>
+    }
+
+    @if (_canViewUsers || _canViewRoles)
+    {
+        <RadzenMenuItem Class="mt-2 mb-n2">
+            @_localizer["Administrator"]
+            @if (_canViewUsers)
+            {
+                <RadzenMenuItem Href="/identity/users" Icon="person">
+                    @_localizer["Users"]
+                </RadzenMenuItem>
+            }
+            @if (_canViewRoles)
+            {
+                <RadzenMenuItem Href="/identity/roles" Icon="person">@_localizer["Roles"]</RadzenMenuItem>
+            }
+
+        </RadzenMenuItem>
+    }
+    @if (_canViewChat)
+    {
+        <RadzenMenuItem Class="mt-2 mb-n2">
+            @_localizer["Communication"]
+            <RadzenMenuItem Href="/chat" Icon="chat">
+                @_localizer["Chat"]
+            </RadzenMenuItem>
+
+        </RadzenMenuItem>
+    }
+    @if (_canViewProducts || _canViewBrands)
+    {
+        <RadzenMenuItem Class="mt-2 mb-n2">
+            @_localizer["Catalog Management"]
+            @if (_canViewProducts)
+            {
+                <RadzenMenuItem Href="/catalog/products" Icon="calltoaction">
+                    @_localizer["Products"]
+                </RadzenMenuItem>
+            }
+            @if (_canViewBrands)
+            {
+                <RadzenMenuItem Href="/catalog/brands" Icon="calltoaction">
+                    @_localizer["Brands"]
+                </RadzenMenuItem>
+            }
+        </RadzenMenuItem>
+    }
+    </RadzenMenu>
+
+    @code {
+    private ClaimsPrincipal _authenticationStateProviderUser;
+
+    private bool _canViewHangfire;
+    private bool _canViewDashboards;
+    private bool _canViewDocuments;
+    private bool _canViewDocumentTypes;
+    private bool _canViewAuditTrails;
+    private bool _canViewRoles;
+    private bool _canViewUsers;
+    private bool _canViewChat;
+    private bool _canViewProducts;
+    private bool _canViewBrands;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _authenticationStateProviderUser = await _stateProvider.GetAuthenticationStateProviderUserAsync();
+        _canViewHangfire = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Hangfire.View)).Succeeded;
+        _canViewDashboards = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Dashboards.View)).Succeeded;
+        _canViewDocuments = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Documents.View)).Succeeded;
+        _canViewDocumentTypes = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.DocumentTypes.View)).Succeeded;
+        _canViewAuditTrails = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.AuditTrails.View)).Succeeded;
+        _canViewRoles = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Roles.View)).Succeeded;
+        _canViewUsers = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Users.View)).Succeeded;
+        _canViewChat = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Communication.Chat)).Succeeded;
+        _canViewProducts = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Products.View)).Succeeded;
+        _canViewBrands = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Brands.View)).Succeeded;
+    }
+}
