@@ -2,8 +2,8 @@
 
 <EditForm Model="@AddEditDocumentModel" OnValidSubmit="SaveAsync">
     <FluentValidationValidator @ref="_fluentValidationValidator" />
-    <MudDialog>
-        <TitleContent>
+    <RadzenDialog>
+        <RadzenStack>
             @{
                 if (AddEditDocumentModel.Id == 0)
                 {
@@ -20,8 +20,8 @@
                     </MudText>
                 }
             }
-        </TitleContent>
-        <DialogContent>
+        </RadzenStack>
+        <RadzenStack>
             <MudGrid>
                 @if (AddEditDocumentModel.Id != 0)
                 {
@@ -79,17 +79,17 @@
                     </MudItem>
                 </MudItem>
             </MudGrid>
-        </DialogContent>
-        <DialogActions>
-            <MudButton Variant="Variant.Filled" OnClick="Cancel">@_localizer["Cancel"]</MudButton>
+        </RadzenStack>
+        <RadzenStack>
+            <RadzenButton Variant="Variant.Filled" OnClick="Cancel">@_localizer["Cancel"]</RadzenButton>
             @if (AddEditDocumentModel.Id != 0)
             {
-                <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Secondary">@_localizer["Update"]</MudButton>
+                <RadzenButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Secondary">@_localizer["Update"]</RadzenButton>
             }
             else
             {
-                <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Success">@_localizer["Save"]</MudButton>
+                <RadzenButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Success">@_localizer["Save"]</RadzenButton>
             }
-        </DialogActions>
-    </MudDialog>
+        </RadzenStack>
+    </RadzenDialog>
 </EditForm>

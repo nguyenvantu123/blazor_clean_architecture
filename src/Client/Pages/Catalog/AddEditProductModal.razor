@@ -2,8 +2,8 @@
 
 <EditForm Model="@AddEditProductModel" OnValidSubmit="SaveAsync">
     <FluentValidationValidator @ref="_fluentValidationValidator" />
-    <MudDialog>
-        <TitleContent>
+    <RadzenDialog>
+        <Radzen.Blazor.Rendering.DialogContainer>
             @{
                 if (AddEditProductModel.Id == 0)
                 {
@@ -20,7 +20,7 @@
                     </MudText>
                 }
             }
-        </TitleContent>
+        </Radzen.Blazor.Rendering.DialogContainer>
         <DialogContent>
             <MudGrid>
                 @if (AddEditProductModel.Id != 0)
@@ -101,5 +101,5 @@
                 <MudButton DisableElevation Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Success">@_localizer["Save"]</MudButton>
             }
         </DialogActions>
-    </MudDialog>
+    </RadzenDialog>
 </EditForm>

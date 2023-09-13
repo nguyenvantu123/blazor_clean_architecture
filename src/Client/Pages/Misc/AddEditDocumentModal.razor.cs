@@ -37,14 +37,14 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Misc
             var response = await DocumentManager.SaveAsync(AddEditDocumentModel);
             if (response.Succeeded)
             {
-                _snackBar.Add(response.Messages[0], Severity.Success);
+               _snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = response.Messages[0], Duration = 4000 });
                 MudDialog.Close();
             }
             else
             {
                 foreach (var message in response.Messages)
                 {
-                    _snackBar.Add(message, Severity.Error);
+                    _snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = message, Duration = 4000 });
                 }
             }
         }

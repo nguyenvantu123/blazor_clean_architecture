@@ -8,109 +8,111 @@
 
 <EditForm Model="@AddEditExtendedAttributeModel" OnValidSubmit="SaveAsync">
     <FluentValidationValidator @ref="_fluentValidationValidator" />
-    <MudDialog>
-        <TitleContent>
+    <RadzenDialog>
+        <RadzenStack>
             @{
                 if (AddEditExtendedAttributeModel.Id.Equals(default))
                 {
-                    <MudText Typo="Typo.h6">
-                        <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-3 mb-n1" />
+                    <RadzenText Typo="Typo.h6">
+                        <RadzenIcon Icon="add" Class="mr-3 mb-n1" />
                         @_localizer["Add Extended Attribute"]
-                    </MudText>
+                    </RadzenText>
                 }
                 else
                 {
-                    <MudText Typo="Typo.h6">
-                        <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-3 mb-n1" />
+                    <RadzenText Typo="Typo.h6">
+                        <RadzenIcon Icon="update" Class="mr-3 mb-n1" />
                         @_localizer["Update Extended Attribute"]
-                    </MudText>
+                    </RadzenText>
                 }
             }
-        </TitleContent>
-        <DialogContent>
-            <MudGrid>
+        </RadzenStack>
+        <RadzenStack>
+            <RadzenStack>
                 @if (AddEditExtendedAttributeModel.Id.Equals(default) != true)
                 {
-                    <MudItem xs="12" md="6">
-                        <MudTextField Disabled For="@(() => AddEditExtendedAttributeModel.Id)" @bind-Value="AddEditExtendedAttributeModel.Id" Label="@_localizer["Id"]" />
-                    </MudItem>
+                    <RadzenColumn xs="12" md="6">
+                        <RadzenText Disabled For="@(() => AddEditExtendedAttributeModel.Id)" @bind-Value="AddEditExtendedAttributeModel.Id" Label="@_localizer["Id"]" />
+                        </RadzenColumn>
                 }
-                <MudItem xs="12" md="6">
-                    <MudTextField Disabled For="@(() => AddEditExtendedAttributeModel.EntityId)" @bind-Value="AddEditExtendedAttributeModel.EntityId" Label="@_localizer["Entity Id"]" />
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudSelect T="EntityExtendedAttributeType" Label="@_localizer["Type"]" For="@(() => AddEditExtendedAttributeModel.Type)" @bind-Value="AddEditExtendedAttributeModel.Type" Variant="Variant.Filled">
+                <RadzenColumn xs="12" md="6">
+                    @*<RadzenTextArea Disabled @bind-Value="AddEditExtendedAttributeModel.EntityId" Label="@_localizer["Entity Id"]" />*@
+                  @*  <RadzenText Disabled For="@(() => AddEditExtendedAttributeModel.EntityId)" @bind-Value="AddEditExtendedAttributeModel.EntityId" Label="@_localizer["Entity Id"]" />*@
+                    <RadzenText Disabled For="@(() => AddEditExtendedAttributeModel.EntityId)" @bind-Value="AddEditExtendedAttributeModel.EntityId" Label="@_localizer["Entity Id"]" />
+                </RadzenColumn>
+                <RadzenColumn xs="12" md="6">
+                    <RadzenCheckBoxList Label="@_localizer["Type"]" For="@(() => AddEditExtendedAttributeModel.Type)" @bind-Value="AddEditExtendedAttributeModel.Type" Variant="Variant.Filled">
                         @foreach (var typeName in Enum.GetNames(typeof(EntityExtendedAttributeType)))
                         {
-                            <MudSelectItem T="EntityExtendedAttributeType" Value="@(Enum.GetValues<EntityExtendedAttributeType>().FirstOrDefault(x => x.ToString() == typeName))">@typeName</MudSelectItem>
+                            <RadzenCheckBoxListItem Value="@(Enum.GetValues<EntityExtendedAttributeType>().FirstOrDefault(x => x.ToString() == typeName))">@typeName</RadzenCheckBoxListItem>
                         }
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudTextField For="@(() => AddEditExtendedAttributeModel.Key)" @bind-Value="AddEditExtendedAttributeModel.Key" Label="@_localizer["Key"]" />
-                </MudItem>
+                    </RadzenCheckBoxList>
+                </RadzenColumn>
+                <RadzenColumn xs="12" md="6">
+                    <RadzenTextArea For="@(() => AddEditExtendedAttributeModel.Key)" @bind-Value="AddEditExtendedAttributeModel.Key" Label="@_localizer["Key"]" />
+                </RadzenColumn>
                 @if (AddEditExtendedAttributeModel.Type == EntityExtendedAttributeType.Decimal)
                 {
-                    <MudItem xs="12" md="6">
-                        <MudNumericField For="@(() => AddEditExtendedAttributeModel.Decimal)" @bind-Value="AddEditExtendedAttributeModel.Decimal" Label="@_localizer["Decimal"]" />
-                    </MudItem>
+                    <RadzenColumn xs="12" md="6">
+                        <RadzenNumeric For="@(() => AddEditExtendedAttributeModel.Decimal)" @bind-Value="AddEditExtendedAttributeModel.Decimal" Label="@_localizer["Decimal"]" />
+                    </RadzenColumn>
                 }
                 else if (AddEditExtendedAttributeModel.Type == EntityExtendedAttributeType.Text)
                 {
-                    <MudItem xs="12" md="6">
-                        <MudTextField For="@(() => AddEditExtendedAttributeModel.Text)" @bind-Value="AddEditExtendedAttributeModel.Text" Label="@_localizer["Text"]" />
-                    </MudItem>
+                    <RadzenColumn xs="12" md="6">
+                        <RadzenTextArea For="@(() => AddEditExtendedAttributeModel.Text)" @bind-Value="AddEditExtendedAttributeModel.Text" Label="@_localizer["Text"]" />
+                    </RadzenColumn>
                 }
                 else if (AddEditExtendedAttributeModel.Type == EntityExtendedAttributeType.DateTime)
                 {
-                    <MudItem xs="12" md="6">
-                        <MudDatePicker @ref="_datePicker" PickerVariant="PickerVariant.Dialog" @bind-Date="AddEditExtendedAttributeModel.DateTime" Label="@_localizer["Date"]">
-                            <PickerActions>
-                                <MudButton Class="mr-auto align-self-start" OnClick="@(() => _datePicker.Clear())">@_localizer["Clear"]</MudButton>
-                                <MudButton OnClick="@(() => _datePicker.Close(false))">@_localizer["Cancel"]</MudButton>
-                                <MudButton Color="Color.Primary" OnClick="@(() => _datePicker.Close())">@_localizer["Ok"]</MudButton>
-                            </PickerActions>
-                        </MudDatePicker>
+                    <RadzenColumn xs="12" md="6">
+                        <RadzenDatePicker @bind-Value="AddEditExtendedAttributeModel.DateTime" ShowTime="true" DateFormat="MM/dd/yyyy" Label="@_localizer["Date"]">
+                            @*  <PickerActions>
+                        <RadzenButton Class="mr-auto align-self-start" OnClick="@(() => _datePicker.Clear())">@_localizer["Clear"]</RadzenButton>
+                        <RadzenButton OnClick="@(() => _datePicker.Close(false))">@_localizer["Cancel"]</RadzenButton>
+                        <RadzenButton Color="Color.Primary" OnClick="@(() => _datePicker.Close())">@_localizer["Ok"]</RadzenButton>
+                        </PickerActions>*@
+                        </RadzenDatePicker>
 
-                        <MudTimePicker @ref="_timePicker" PickerVariant="PickerVariant.Dialog" Label="@_localizer["Time"]" @bind-Time="_time">
-                            <PickerActions>
-                                <MudButton Class="mr-auto align-self-start" OnClick="@(() => _timePicker.Clear())">@_localizer["Clear"]</MudButton>
-                                <MudButton OnClick="@(() => _timePicker.Close(false))">@_localizer["Cancel"]</MudButton>
-                                <MudButton Color="Color.Primary" OnClick="@(() => _timePicker.Close())">@_localizer["Ok"]</MudButton>
-                            </PickerActions>
-                        </MudTimePicker>
-                    </MudItem>
+                        <RadzenDatePicker ShowTime="true" TimeOnly="true" Label="@_localizer["Time"]" @bind-Value="_time">
+                            @* <PickerActions>
+                        <RadzenButton Class="mr-auto align-self-start" OnClick="@(() => _timePicker.Clear())">@_localizer["Clear"]</RadzenButton>
+                        <RadzenButton OnClick="@(() => _timePicker.Close(false))">@_localizer["Cancel"]</RadzenButton>
+                        <RadzenButton Color="Color.Primary" OnClick="@(() => _timePicker.Close())">@_localizer["Ok"]</RadzenButton>
+                        </PickerActions>*@
+                        </RadzenDatePicker>
+                    </RadzenColumn>
                 }
                 else if (AddEditExtendedAttributeModel.Type == EntityExtendedAttributeType.Json)
                 {
-                    <MudItem xs="12" md="6">
-                        <MudTextField For="@(() => AddEditExtendedAttributeModel.Json)" @bind-Value="AddEditExtendedAttributeModel.Json" Label="@_localizer["Json"]" Variant="Variant.Outlined" Lines="10" />
-                    </MudItem>
+                    <RadzenColumn xs="12" md="6">
+                        <RadzenTextArea For="@(() => AddEditExtendedAttributeModel.Json)" @bind-Value="AddEditExtendedAttributeModel.Json" Label="@_localizer["Json"]" Variant="Variant.Outlined" Lines="10" />
+                    </RadzenColumn>
                 }
-                <MudItem xs="12" md="6">
-                    <MudTextField T="string" For="@(() => AddEditExtendedAttributeModel.ExternalId)" @bind-Value="AddEditExtendedAttributeModel.ExternalId" Label="@_localizer["External Id"]" />
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudTextField T="string" For="@(() => AddEditExtendedAttributeModel.Group)" @bind-Value="AddEditExtendedAttributeModel.Group" Label="@_localizer["Group"]" />
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudTextField For="@(() => AddEditExtendedAttributeModel.Description)" @bind-Value="AddEditExtendedAttributeModel.Description" Label="@_localizer["Description"]" />
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudCheckBox For="@(() => AddEditExtendedAttributeModel.IsActive)" @bind-Checked="@AddEditExtendedAttributeModel.IsActive" Color="Color.Secondary" Label="@_localizer["Is Active"]" />
-                </MudItem>
-            </MudGrid>
-        </DialogContent>
-        <DialogActions>
-            <MudButton Variant="Variant.Filled" OnClick="Cancel">@_localizer["Cancel"]</MudButton>
+                <RadzenColumn xs="12" md="6">
+                    <RadzenTextArea T="string" For="@(() => AddEditExtendedAttributeModel.ExternalId)" @bind-Value="AddEditExtendedAttributeModel.ExternalId" Label="@_localizer["External Id"]" />
+                </RadzenColumn>
+                <RadzenColumn xs="12" md="6">
+                    <RadzenTextArea T="string" For="@(() => AddEditExtendedAttributeModel.Group)" @bind-Value="AddEditExtendedAttributeModel.Group" Label="@_localizer["Group"]" />
+                </RadzenColumn>
+                <RadzenColumn xs="12" md="6">
+                    <RadzenTextArea For="@(() => AddEditExtendedAttributeModel.Description)" @bind-Value="AddEditExtendedAttributeModel.Description" Label="@_localizer["Description"]" />
+                </RadzenColumn>
+                <RadzenColumn xs="12" md="6">
+                    <RadzenCheckBox For="@(() => AddEditExtendedAttributeModel.IsActive)" @bind-Value="@AddEditExtendedAttributeModel.IsActive" Color="Color.Secondary" Label="@_localizer["Is Active"]" />
+                </RadzenColumn>
+            </RadzenStack>
+        </RadzenStack>
+        <RadzenStack>
+            <RadzenButton Variant="Variant.Filled" OnClick="Cancel">@_localizer["Cancel"]</RadzenButton>
             @if (AddEditExtendedAttributeModel.Id.Equals(default) != true)
             {
-                <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Secondary">@_localizer["Update"]</MudButton>
+                <RadzenButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Secondary">@_localizer["Update"]</RadzenButton>
             }
             else
             {
-                <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Success">@_localizer["Save"]</MudButton>
+                <RadzenButton Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Success">@_localizer["Save"]</RadzenButton>
             }
-        </DialogActions>
-    </MudDialog>
+        </RadzenStack>
+    </RadzenDialog>
 </EditForm>

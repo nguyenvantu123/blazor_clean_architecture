@@ -31,7 +31,9 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Authentication
             {
                 foreach (var message in result.Messages)
                 {
-                    _snackBar.Add(message, Severity.Error);
+                    //_snackBar.Notify(message, Severity.Error);
+
+                    _snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = message, Duration = 4000 });
                 }
             }
         }

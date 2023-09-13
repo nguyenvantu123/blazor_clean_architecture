@@ -12,11 +12,14 @@
 <HeroTitle Title="@_localizer["Products"]" Description="@_localizer["Manage Products."]" />
 @if (!_loaded)
 {
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    <RadzenProgressBarCircular Color="Color.Primary" Indeterminate="true" />
 }
 else
 {
-    <MudTable Elevation="25" ServerData="@(new Func<TableState, Task<TableData<GetAllPagedProductsResponse>>>(ServerReload))" Hover="true" Dense="@_dense" Bordered="@_bordered" Striped="@_striped" @ref="_table">
+    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="25" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or"
+        
+       @* Elevation="25" ServerData="@(new Func<TableState, Task<TableData<GetAllPagedProductsResponse>>>(ServerReload))" Hover="true" Dense="@_dense" Bordered="@_bordered" Striped="@_striped" @ref="_table"*@>
         <ToolBarContent>
             <div class="justify-center mud-text-align-center">
                 @if (_canCreateProducts)
@@ -94,13 +97,13 @@ else
                 }
             </MudTd>
         </RowTemplate>
-        <FooterContent>
+      @*  <FooterContent>
             <MudSwitch @bind-Checked="@_dense" Color="Color.Secondary" Style="margin-left: 5px;">@_localizer["Dense"]</MudSwitch>
             <MudSwitch @bind-Checked="@_striped" Color="Color.Tertiary" Style="margin-left: 5px;">@_localizer["Striped"]</MudSwitch>
             <MudSwitch @bind-Checked="@_bordered" Color="Color.Warning" Style="margin-left: 5px;">@_localizer["Bordered"]</MudSwitch>
-        </FooterContent>
+        </FooterContent>*@
         <PagerContent>
             <TablePager />
         </PagerContent>
-    </MudTable>
+    </RadzenDataGrid>
 }

@@ -5,7 +5,7 @@ using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
-using MudBlazor;
+//using MudBlazor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +15,9 @@ using BlazorHero.CleanArchitecture.Application.Features.Products.Commands.AddEdi
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Catalog.Product;
 using BlazorHero.CleanArchitecture.Shared.Constants.Permission;
 using Microsoft.AspNetCore.Authorization;
+using BlazorHero.CleanArchitecture.Application.Models.Chat;
+using Radzen;
+using Radzen.Blazor;
 
 namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
 {
@@ -25,7 +28,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
         private IEnumerable<GetAllPagedProductsResponse> _pagedData;
-        private MudTable<GetAllPagedProductsResponse> _table;
+        private RadzenDataGrid<GetAllPagedProductsResponse> _table;
         private int _totalItems;
         private int _currentPage;
         private string _searchString = "";
@@ -58,14 +61,14 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
             }
         }
 
-        private async Task<TableData<GetAllPagedProductsResponse>> ServerReload(TableState state)
+        private async Task<RadzenDataGrid<GetAllPagedProductsResponse>> ServerReload(State state)
         {
             if (!string.IsNullOrWhiteSpace(_searchString))
             {
                 state.Page = 0;
             }
             await LoadData(state.Page, state.PageSize, state);
-            return new TableData<GetAllPagedProductsResponse> { TotalItems = _totalItems, Items = _pagedData };
+            return new RadzenDataGrid<GetAllPagedProductsResponse> { Count = _totalItems, Data = _pagedData };
         }
 
         private async Task LoadData(int pageNumber, int pageSize, TableState state)
@@ -73,7 +76,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
             string[] orderings = null;
             if (!string.IsNullOrEmpty(state.SortLabel))
             {
-                orderings = state.SortDirection != SortDirection.None ? new[] {$"{state.SortLabel} {state.SortDirection}"} : new[] {$"{state.SortLabel}"};
+                orderings = state.SortDirection != SortDirection.None ? new[] { $"{state.SortLabel} {state.SortDirection}" } : new[] { $"{state.SortLabel}" };
             }
 
             var request = new GetAllPagedProductsRequest { PageSize = pageSize, PageNumber = pageNumber + 1, SearchString = _searchString, Orderby = orderings };
@@ -88,7 +91,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
             {
                 foreach (var message in response.Messages)
                 {
-                    _snackBar.Add(message, Severity.Error);
+                    _snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = message, Duration = 4000 });
                 }
             }
         }
@@ -96,7 +99,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
         private void OnSearch(string text)
         {
             _searchString = text;
-            _table.ReloadServerData();
+            _table.Reload();
         }
 
         private async Task ExportToExcel()
@@ -110,22 +113,26 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
                     FileName = $"{nameof(Products).ToLower()}_{DateTime.Now:ddMMyyyyHHmmss}.xlsx",
                     MimeType = ApplicationConstants.MimeTypes.OpenXml
                 });
-                _snackBar.Add(string.IsNullOrWhiteSpace(_searchString)
-                    ? _localizer["Products exported"]
-                    : _localizer["Filtered Products exported"], Severity.Success);
+                //_snackBar.Add(string.IsNullOrWhiteSpace(_searchString)
+                //    ? _localizer["Products exported"]
+                //    : _localizer["Filtered Products exported"], Severity.Success);
+
+                _snackBar.Notify(string.IsNullOrWhiteSpace(_searchString)
+                    ? new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Detail = _localizer["Products exported"], Duration = 4000 }
+                    : new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Success, Detail = _localizer["Filtered Products exported"], Duration = 4000 });
             }
             else
             {
                 foreach (var message in response.Messages)
                 {
-                    _snackBar.Add(message, Severity.Error);
+                    _snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = message, Duration = 4000 });
                 }
             }
         }
 
         private async Task InvokeModal(int id = 0)
         {
-            var parameters = new DialogParameters();
+            var parameters = new Dictionary<string, object>();
             if (id != 0)
             {
                 var product = _pagedData.FirstOrDefault(c => c.Id == id);
@@ -142,8 +149,8 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
                     });
                 }
             }
-            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<AddEditProductModal>(id == 0 ? _localizer["Create"] : _localizer["Edit"], parameters, options);
+            var options = new DialogOptions { Width = "700px", Height = "512px", Resizable = true, Draggable = true };
+            var dialog = _dialogService.OpenAsync<AddEditProductModal>(id == 0 ? _localizer["Create"] : _localizer["Edit"], parameters, options);
             var result = await dialog.Result;
             if (!result.Cancelled)
             {
@@ -154,12 +161,12 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
         private async Task Delete(int id)
         {
             string deleteContent = _localizer["Delete Content"];
-            var parameters = new DialogParameters
+            var parameters = new Dictionary<string, object>
             {
-                {nameof(Shared.Dialogs.DeleteConfirmation.ContentText), string.Format(deleteContent, id)}
+                {nameof(Shared.Dialogs.DeleteConfirmation.ContentText), $"{_localizer["Logout Confirmation"]}"},
             };
-            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<Shared.Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
+            var options = new DialogOptions { Width = "700px", Height = "512px", Resizable = true, Draggable = true };
+            var dialog = _dialogService.OpenAsync<Shared.Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
             var result = await dialog.Result;
             if (!result.Cancelled)
             {
@@ -168,14 +175,15 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Catalog
                 {
                     OnSearch("");
                     await HubConnection.SendAsync(ApplicationConstants.SignalR.SendUpdateDashboard);
-                    _snackBar.Add(response.Messages[0], Severity.Success);
+                    //_snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = response.Messages[0], Duration = 4000 });
+                    _snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = response.Messages[0], Duration = 4000 });
                 }
                 else
                 {
                     OnSearch("");
                     foreach (var message in response.Messages)
                     {
-                        _snackBar.Add(message, Severity.Error);
+                        _snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = message, Duration = 4000 });
                     }
                 }
             }
