@@ -15,7 +15,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
-using MudBlazor;
+//using MudBlazor;
+using Radzen;
+using Radzen.Blazor;
+using DialogOptions = Radzen.DialogOptions;
 
 namespace BlazorHero.CleanArchitecture.Client.Shared.Components
 {
@@ -56,7 +59,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
         private bool _includeEntity;
         private bool _onlyCurrentGroup;
         private int _activeGroupIndex;
-        private MudTabs _mudTabs;
+        private RadzenTabs _mudTabs;
         private bool _dense = false;
         private bool _striped = true;
         private bool _bordered = false;
@@ -76,7 +79,8 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
             _canViewExtendedAttributes = (await _authorizationService.AuthorizeAsync(_currentUser, ExtendedAttributesViewPolicyName)).Succeeded;
             if (!_canViewExtendedAttributes)
             {
-                _snackBar.Add(_localizer["Not Allowed."], Severity.Error);
+                //_snackBar.Add(_localizer["Not Allowed."], Severity.Error);
+                _snackBar.Notify(new NotificationMessage { Detail = _localizer["Not Allowed."], Severity = NotificationSeverity.Error });
                 _navigationManager.NavigateTo("/");
             }
             _canEditExtendedAttributes = (await _authorizationService.AuthorizeAsync(_currentUser, ExtendedAttributesEditPolicyName)).Succeeded;
@@ -149,7 +153,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
                 EntityId = EntityId,
                 IncludeEntity = _includeEntity,
                 OnlyCurrentGroup = _onlyCurrentGroup && _activeGroupIndex != 0,
-                CurrentGroup = _mudTabs.Panels[_activeGroupIndex].Text
+                CurrentGroup = _mudTabs.c[_activeGroupIndex].Text
             };
             var response = await ExtendedAttributeManager.ExportToExcelAsync(request);
             if (response.Succeeded)
@@ -160,9 +164,13 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
                     FileName = $"{typeof(TExtendedAttribute).Name.ToLower()}_{DateTime.Now:ddMMyyyyHHmmss}.xlsx",
                     MimeType = ApplicationConstants.MimeTypes.OpenXml
                 });
-                _snackBar.Add(string.IsNullOrWhiteSpace(request.SearchString) && !request.IncludeEntity && !request.OnlyCurrentGroup
-                    ? _localizer["Extended Attributes exported"]
-                    : _localizer["Filtered Extended Attributes exported"], Severity.Success);
+                //_snackBar.Add(string.IsNullOrWhiteSpace(request.SearchString) && !request.IncludeEntity && !request.OnlyCurrentGroup
+                //    ? _localizer["Extended Attributes exported"]
+                //    : _localizer["Filtered Extended Attributes exported"], Severity.Success);
+
+                _snackBar.Notify(string.IsNullOrWhiteSpace(request.SearchString) && !request.IncludeEntity && !request.OnlyCurrentGroup
+                  ? new NotificationMessage { Severity = NotificationSeverity.Success, Detail = _localizer["Extended Attributes exported"] }
+                  : new NotificationMessage { Severity = NotificationSeverity.Success, Detail = _localizer["Filtered Extended Attributes exported"] });
             }
             else
             {
@@ -207,7 +215,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
                 });
             }
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<AddEditExtendedAttributeModal<TId, TEntityId, TEntity, TExtendedAttribute>>(id.Equals(default) ? _localizer["Create"] : _localizer["Edit"], parameters, options);
+            var dialog = _dialogService.OpenAsync<AddEditExtendedAttributeModal<TId, TEntityId, TEntity, TExtendedAttribute>>(id.Equals(default) ? _localizer["Create"] : _localizer["Edit"], parameters, options);
             var result = await dialog.Result;
             if (!result.Cancelled)
             {
@@ -218,20 +226,20 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
         private async Task Delete(TId id)
         {
             string deleteContent = _localizer["Delete Extended Attribute?"];
-            var parameters = new DialogParameters
+            var parameters = new Dictionary<string>
             {
                 {nameof(Dialogs.DeleteConfirmation.ContentText), string.Format(deleteContent, id)}
             };
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
+            var dialog = _dialogService.OpenAsync<Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
             var result = await dialog.Result;
             if (!result.Cancelled)
             {
                 var response = await ExtendedAttributeManager.DeleteAsync(id);
                 if (response.Succeeded)
                 {
-                     await Reset();
-                   _snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = response.Messages[0], Duration = 4000 });
+                    await Reset();
+                    _snackBar.Notify(new Radzen.NotificationMessage { Severity = Radzen.NotificationSeverity.Error, Detail = response.Messages[0], Duration = 4000 });
                 }
                 else
                 {
